@@ -8,9 +8,8 @@ import { GrUserAdmin } from "react-icons/gr";
 import { BsFillChatLeftTextFill, BsPeopleFill, BsPersonCircle, BsChatDots, BsCheck, BsCheckAll, BsFillPersonFill, BsPeople } from "react-icons/bs";
 import axios from 'axios';
 import ScrollableFeed from 'react-scrollable-feed';
-import Swal from 'sweetalert2'
 
-class DoctorChat extends Component {
+class StaffChat extends Component {
 
     constructor(props) {
         super(props)
@@ -58,7 +57,7 @@ class DoctorChat extends Component {
         this.selectedReciver = this.selectedReciver.bind(this);
         this.changeMessageHandler = this.changeMessageHandler.bind(this);
         this.addMessage = this.addMessage.bind(this);
-        this.navigateStaffUsers = this.navigateStaffUsers.bind(this);
+        this.navigateDoctorUsers = this.navigateDoctorUsers.bind(this);
         this.navigateAdminUsers = this.navigateAdminUsers.bind(this);
         this.dateConverter = this.dateConverter.bind(this);
         this.editMessage = this.editMessage.bind(this);
@@ -197,58 +196,56 @@ class DoctorChat extends Component {
 
     }
 
-    navigateStaffUsers = (e) => {
+    navigateDoctorUsers = (e) => {
         e.preventDefault();
 
         //write axios call to get all staff users
 
-        const staffUsersList = [
+        const doctorUsersList = [
             {
-                "name": "David Lee",
-                "id": "ST0001"
+                "name": "John Smith",
+                "id": "DO0001"
             },
+            { "name": "Jagath Sapmal", "id": "DO12345" },
             {
-                "name": "Samantha Chang",
-                "id": "ST0002"
+                "name": "Maria Garcia",
+                "id": "DO0003"
             },
             {
                 "name": "Raj Patel",
-                "id": "ST0003"
-            },
-            {
-                "name": "Maria Hernandez",
-                "id": "ST0004"
+                "id": "DO0004"
             },
             {
                 "name": "Giovanni Rossi",
-                "id": "ST0005"
+                "id": "DO0005"
             },
             {
                 "name": "Emily Wilson",
-                "id": "ST0006"
+                "id": "DO0006"
             },
             {
                 "name": "Juan Gonzalez",
-                "id": "ST0007"
+                "id": "DO0007"
             },
             {
                 "name": "Hiroshi Nakamura",
-                "id": "ST0008"
+                "id": "DO0008"
             },
             {
                 "name": "Marta Sanchez",
-                "id": "ST0009"
+                "id": "DO0009"
             },
             {
                 "name": "Alexandre Dupont",
-                "id": "ST0010"
+                "id": "DO0010"
             }
         ];
+
 
         let { systemAvbUsers } = this.state;
         systemAvbUsers = [];
 
-        staffUsersList.map(obj => {
+        doctorUsersList.map(obj => {
 
             let dataObj = {
                 name: obj.name,
@@ -261,7 +258,7 @@ class DoctorChat extends Component {
 
         this.setState({
             systemAvbUsers,
-            userType: 'Staff',
+            userType: 'Doctor',
             selectedChatType: 'newChat'
         });
 
@@ -296,13 +293,7 @@ class DoctorChat extends Component {
 
 
                         } else {
-
-                            Swal.fire(
-                                res.data.message,
-
-                                'error'
-                            )
-
+                            alert(res.data.message)
                         }
 
                     })
@@ -317,17 +308,7 @@ class DoctorChat extends Component {
 
 
         } catch {
-
-            Swal.fire({
-
-                position: 'top-end',
-                icon: 'error',
-                title: 'Error in retriving previos message history',
-                showConfirmButton: false,
-                timer: 1500
-            }
-            )
-
+            alert("error in retriving previos message history")
         }
 
 
@@ -341,23 +322,14 @@ class DoctorChat extends Component {
         const { reciver: { reciverID, reciverName }, message } = this.state;
 
         if (!reciverID || !reciverName || !message) {
-            Swal.fire({
-
-                position: 'top-end',
-                icon: 'warning',
-                title: 'Please enter a message',
-                showConfirmButton: false,
-                timer: 1500
-            }
-            )
-
+            alert("Please enter a message");
             return;
         }
 
         const postData = {
-            "doctorId": this.state.sennder.sennderID,
+            "doctorId": reciverID.startsWith('DO') ? reciverID : "",
             "adminId": reciverID.startsWith('AD') ? reciverID : "",
-            "staffId": reciverID.startsWith('ST') ? reciverID : "",
+            "staffId": this.state.sennder.sennderID,
             "sennder": this.state.sennder.sennderID,
             "reciver": reciverID,
             "msg": message,
@@ -368,24 +340,11 @@ class DoctorChat extends Component {
 
         axios.post(url, postData).then((res) => {
             if (res.data.status) {
-
                 this.setState({
                     message: ''
                 })
-
             } else {
-              
-
-                Swal.fire({
-
-                    position: 'top-end',
-                    icon: 'error',
-                    title: res.data.message,
-                    showConfirmButton: false,
-                    timer: 1500
-                }
-                )
-    
+                alert(res.data.message);
             }
         });
     }
@@ -413,9 +372,11 @@ class DoctorChat extends Component {
                 reciverID: reciver.id
             },
         }, () => {
+
             this.interval = setInterval(() => {
                 this.getAllMessages();
             }, 1000);
+
 
         })
     }
@@ -440,14 +401,15 @@ class DoctorChat extends Component {
 
         this.setState({
             sennder: {
-                sennderName: "Jagath Sapmal",
-                sennderID: "DO12345"
+                sennderName: "Samantha Chang",
+                sennderID: "ST0002"
             },
         }, () => {
-
             this.interval = setInterval(() => {
                 this.getMessageHistoryByUser();
             }, 3000);
+
+
 
         })
     }
@@ -458,24 +420,15 @@ class DoctorChat extends Component {
         const url = 'http://localhost:8000/api/message/getAllMessages';
 
         if (!reciverID || !reciverName) {
-         
-            Swal.fire({
-
-                position: 'top-end',
-                icon: 'warning',
-                title: "Please Select user",
-                showConfirmButton: false,
-                timer: 1500
-            }
-            )
+            alert("Please Select user");
             return;
         }
 
 
         const data = {
-            "doctorId": this.state.sennder.sennderID,
+            "doctorId": reciverID.startsWith('DO') ? reciverID : "",
             "adminId": reciverID.startsWith('AD') ? reciverID : "",
-            "staffId": reciverID.startsWith('ST') ? reciverID : "",
+            "staffId": this.state.sennder.sennderID,
         }
 
         axios.post(url, data).then((res) => {
@@ -497,7 +450,7 @@ class DoctorChat extends Component {
 
     getMessageHistoryByUser() {
 
-
+        console.log("///////", this.state.sennder.sennderID)
         if (this.state.sennder.sennderID !== "") {
 
             const url = 'http://localhost:8000/api/messageHistory/getHistoryBySender';
@@ -514,6 +467,7 @@ class DoctorChat extends Component {
                     systemPrevMessageUsersDuplicate = [];
 
 
+
                     for (let i = users.length - 1; i >= 0; i--) { // Iterate through the array from last to first
                         const obj = users[i];
 
@@ -526,7 +480,6 @@ class DoctorChat extends Component {
                             systemPrevMessageUsers.push(dataObj);
                             systemPrevMessageUsersDuplicate.push(dataObj.name);
                         }
-
                     }
 
                     this.setState({
@@ -534,37 +487,19 @@ class DoctorChat extends Component {
                         systemPrevMessageUsersDuplicate
 
                     }, () => {
-                        console.log("11eee", this.state.systemPrevMessageUsers)
+                        console.log("11111sss", this.state.systemPrevMessageUsers)
                     });
 
 
 
                 } else {
-               
-                    Swal.fire({
-
-                        position: 'top-end',
-                        icon: 'error',
-                        title: res.data.message,
-                        showConfirmButton: false,
-                        timer: 1500
-                    }
-                    )
+                    alert(res.data.message);
                 }
             })
 
 
         } else {
-       
-            Swal.fire({
-
-                position: 'top-end',
-                icon: 'error',
-                title: "loged user cant identifay please refresh the page",
-                showConfirmButton: false,
-                timer: 1500
-            }
-            )
+            alert("loged user cant identifay please refresh the page");
         }
     }
 
@@ -663,7 +598,7 @@ class DoctorChat extends Component {
                                                 </Button>
                                             </Col>
                                             <Col >
-                                                <Button style={{ "backgroundColor": "#649da9", "height": "30px", "marginTop": "4px", "fontSize": "larger" }} className="btn " variant="addDel" type="submit" onClick={this.navigateStaffUsers}>
+                                                <Button style={{ "backgroundColor": "#649da9", "height": "30px", "marginTop": "4px", "fontSize": "larger" }} className="btn " variant="addDel" type="submit" onClick={this.navigateDoctorUsers}>
                                                     <BsFillChatLeftTextFill style={{ "alignItems": "center", "backgroundColor": "#649da9", "height": "22px", "marginTop": "-5px", "fontSize": "larger" }} />
                                                 </Button>
                                             </Col>
@@ -690,7 +625,7 @@ class DoctorChat extends Component {
                                                     </Button>
                                                 </Col>
                                                 <Col >
-                                                    <Button style={{ "backgroundColor": "#649da9", "height": "30px", "fontSize": "larger", "marginTop": "2px" }} className="btn " variant="addDel" type="submit" onClick={this.navigateStaffUsers}>
+                                                    <Button style={{ "backgroundColor": "#649da9", "height": "30px", "fontSize": "larger", "marginTop": "2px" }} className="btn " variant="addDel" type="submit" onClick={this.navigateDoctorUsers}>
                                                         <BsPeople style={{ "alignItems": "center", "backgroundColor": "#649da9", "height": "22px", "marginTop": "-18px", "fontSize": "larger" }} />
                                                     </Button>
                                                 </Col>
@@ -744,7 +679,7 @@ class DoctorChat extends Component {
                                                     </Button> */}
                                                 </Col>
                                                 <Col >
-                                                    {/* <Button style={{ "backgroundColor": "#649da9", "height": "30px", "fontSize": "larger", "marginTop": "2px" }} className="btn " variant="addDel" type="submit" onClick={this.navigateStaffUsers}>
+                                                    {/* <Button style={{ "backgroundColor": "#649da9", "height": "30px", "fontSize": "larger", "marginTop": "2px" }} className="btn " variant="addDel" type="submit" onClick={this.navigateDoctorUsers}>
                                                         <BsFillChatLeftTextFill style={{ "alignItems": "center", "backgroundColor": "#649da9", "height": "22px", "marginTop": "-18px", "fontSize": "larger" }} />
                                                     </Button> */}
                                                 </Col>
@@ -905,5 +840,5 @@ class DoctorChat extends Component {
     }
 }
 
-export default DoctorChat;
+export default StaffChat;
 
