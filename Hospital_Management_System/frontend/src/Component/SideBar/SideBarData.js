@@ -20,9 +20,20 @@ export const SidebarData = [
     },
    
     {
-        title: "Message",
+        title: "Doctor Message",
         icon: <BsArrowDownCircleFill />,
-        Link: "/doctorMsg"
+        Link: "/DoctorChat"
+    },
+    {
+        title: "Staff Message",
+        icon: <BsArrowDownCircleFill />,
+        Link: "/StaffChat"
+    },
+
+    {
+        title: "Staff",
+        icon: <BsArrowDownCircleFill />,
+        Link: "/DoctorChat"
     },
    
 ]

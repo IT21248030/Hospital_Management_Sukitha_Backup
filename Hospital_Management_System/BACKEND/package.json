@@ -4,7 +4,7 @@
   "description": "Hospital Management system",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "author": "Nipuni",
   "license": "ISC",
@@ -12,6 +12,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mongoose": "^6.9.2"
+    "mongoose": "^6.9.2",
+    "nodemon": "^2.0.16"
   }
 }
